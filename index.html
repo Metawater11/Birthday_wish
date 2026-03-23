@@ -117,12 +117,15 @@
 <body>
 
 <div class="container">
-<div id="welcome" class="screen active">
-    <h1>Aarambikalama Ponnae! ✨</h1>
-    <p class="sub-text">Happy Birthday <strong>Brindha..😽💖🥰🦚</strong>!<br>
-    My dear thozhi... இந்த 3 songs unaku pidikum. 3/3 score பண்ணா மட்டும்தான் உன்னோட Birthday special Video வரும்!</p>
+  <div id="welcome" class="screen active">
+    <h1>aarambikalama! ponnae...</h1>
+    <p class="sub-text">Happy Birthday <strong>Brindha..😽💖🥰🦚</strong>! 🎉
+      <br>
+      <h1>MY thozhi...</h1>
+      <br>இந்த 3 songs unaku pidikum. 3/3 score பண்ணா மட்டும்தான் உன்னோட Birthday  special Video வரும்!</p>
     <button class="btn" onclick="startQuiz()">🎵 Start Memory Quiz</button>
   </div>
+
   <div id="quiz" class="screen">
     <h2 id="round-num" style="color: var(--madurai-gold);">Song 1/3</h2>
     <div class="timer-container"><div id="timer-bar"></div></div>
@@ -153,19 +156,22 @@
 <script>
   const songs = [
     {
-      file: "song1.mp3", // Ilakana Kavithai
+      file: "song1.mp3",
       ans: ["ilakana kavithai", "ilakana", "banaras", "kavithai"],
       vibe: "Song 1: இது உன் பேரோட சேர்ந்த melody! Remember?",
+      startAt: 45 // Starts at 45 seconds
     },
     {
-      file: "song2.mp3", // Katre Poongatre
+      file: "song2.mp3",
       ans: ["katre poongatre", "katre", "priyamana thozhi", "priyamanathozhi"],
       vibe: "Song 2: Our favorite friendship anthem! 🎶",
+      startAt: 65 // Starts at 1 min 5 seconds
     },
     {
-      file: "song3.mp3", // Pookkal Pookkum
+      file: "song3.mp3",
       ans: ["pookkal pookkum", "pookal pookum", "madharasapattinam", "madrasapattinam", "pookal"],
       vibe: "Song 3: The ultimate classic from Madrasapattinam!",
+      startAt: 70 // Starts at 1 min 10 seconds
     }
   ];
 
@@ -189,9 +195,16 @@
     timeLeft = 30;
     document.getElementById('timer-bar').style.width = '100%';
 
-    // Load and Play local MP3
     player.src = song.file;
-    player.play();
+
+    // THIS PART FIXES THE START TIME
+    player.onloadedmetadata = function() {
+      player.currentTime = song.startAt;
+      player.play().catch(err => {
+        document.getElementById('feedback').innerText = "Tap 'Check Answer' to play sound!";
+      });
+    };
+
     startTimer();
   }
 
@@ -212,7 +225,6 @@
   function verifyAnswer() {
     const input = document.getElementById('answer').value.toLowerCase().trim();
     const song = songs[currentRound];
-
     const isCorrect = song.ans.some(a => input.includes(a) && input.length >= 4);
 
     if (isCorrect) {
@@ -234,7 +246,6 @@
   function showTreasure() {
     document.getElementById('quiz').classList.remove('active');
     document.getElementById('treasure').classList.add('active');
-
     var end = Date.now() + (5 * 1000);
     (function frame() {
       confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFD700', '#ec407a'] });

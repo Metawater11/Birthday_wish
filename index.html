@@ -1,274 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Birthday Surprise!</title>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <style>
-    :root {
-      --madurai-gold: #FFD700;
-      --deep-purple: #2d0b5a;
-      --vibrant-pink: #ec407a;
-      --glass: rgba(255, 255, 255, 0.15);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Poppins', 'Noto Sans Tamil', sans-serif;
-      background: linear-gradient(135deg, #1a0533 0%, #2d0b5a 50%, #4a0e4e 100%);
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-x: hidden;
-      text-align: center;
-    }
-
-    .container {
-      width: 92%; max-width: 450px;
-      padding: 2.5rem;
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      border-radius: 30px;
-      border: 1px solid rgba(255, 215, 0, 0.3);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-      z-index: 10;
-      position: relative;
-    }
-
-    h1 {
-      font-family: 'Dancing Script', cursive;
-      color: var(--madurai-gold);
-      font-size: clamp(2.2rem, 7vw, 2.8rem);
-      margin-bottom: 0.5rem;
-    }
-    .sub-text {
-      font-size: clamp(0.85rem, 3vw, 0.95rem);
-      margin-bottom: 2rem;
-      opacity: 0.9;
-      line-height: 1.6;
-    }
-
-    .screen { display: none; animation: slideUp 0.6s ease-out; }
-    .active { display: block; }
-
-    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-    .btn {
-      background: linear-gradient(45deg, var(--madurai-gold), #ffb300);
-      color: #1a0533; border: none;
-      padding: 15px 35px; border-radius: 50px;
-      font-weight: 700; cursor: pointer;
-      transition: 0.3s; text-transform: uppercase;
-      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-      font-size: 0.9rem; letter-spacing: 1px;
-    }
-    .btn:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--madurai-gold); }
-
-    .timer-container {
-      width: 100%; height: 8px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px; margin: 20px 0;
-      overflow: hidden;
-    }
-    #timer-bar {
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, var(--vibrant-pink), var(--madurai-gold));
-      transition: width 1s linear;
-    }
-
-    input[type="text"] {
-      width: 100%; padding: 18px;
-      border-radius: 15px; border: 2px solid transparent;
-      background: rgba(0,0,0,0.4); color: white;
-      margin-top: 15px; text-align: center;
-      font-size: 1.1rem; outline: none;
-      transition: all 0.3s;
-    }
-    input:focus { border-color: var(--madurai-gold); background: rgba(0,0,0,0.6); }
-
-    .hint-box {
-      font-size: 0.85rem; color: var(--madurai-gold);
-      margin: 12px 0 20px; font-style: italic;
-    }
-
-    #treasure-qr {
-      width: 100%; max-width: 260px;
-      border: 8px solid var(--madurai-gold);
-      border-radius: 20px; margin: 20px 0;
-      background: white; padding: 8px;
-      box-shadow: 0 0 35px rgba(255, 215, 0, 0.5);
-    }
-
-    .audio-status {
-      background: rgba(255,255,255,0.1);
-      padding: 12px 15px; border-radius: 15px;
-      margin: 15px 0; font-size: 0.9rem;
-      border-left: 4px solid var(--madurai-gold);
-    }
-
-    #feedback { margin-top: 15px; font-weight: bold; min-height: 25px; }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <div id="welcome" class="screen active">
-    <h1>aarambikalama! ponnae...</h1>
-    <p class="sub-text">Happy Birthday <strong>Brindha..😽💖🥰🦚</strong>! 🎉
-      <br>
-      <h1>MY thozhi...</h1>
-      <br>இந்த 3 songs unaku pidikum. 3/3 score பண்ணா மட்டும்தான் உன்னோட Birthday  special Video வரும்!</p>
-    <button class="btn" onclick="startQuiz()">🎵 Start Memory Quiz</button>
-  </div>
-
-  <div id="quiz" class="screen">
-    <h2 id="round-num" style="color: var(--madurai-gold);">Song 1/3</h2>
-    <div class="timer-container"><div id="timer-bar"></div></div>
-
-    <div id="memory-vibe" class="audio-status"></div>
-
-    <input type="text" id="answer" placeholder="Enter Movie or Song name..." autocomplete="off">
-    <p class="hint-box">Movie name (OR) Song name okay!</p>
-
-    <button class="btn" onclick="verifyAnswer()">Check Answer</button>
-    <p id="feedback"></p>
-  </div>
-
-  <div id="treasure" class="screen">
-    <h1 style="color: var(--madurai-gold);">You Legend! 🏆</h1>
-    <p style="margin-bottom: 1.5rem;">The memories are safe with you. Here is your special wish waitng...</p>
-    <img src="frame%20(1).png" id="treasure-qr" alt="Birthday Video QR">
-    <p style="color: var(--madurai-gold); font-weight: bold; margin-top: 1rem;">
-      Scan this QR for your video! ❤️
-    </p>
-  </div>
-</div>
-
-<div id="player-container" style="position: absolute; top: -9999px;"><div id="player"></div></div>
+<audio id="audio-player"></audio>
 
 <script>
-  const songs = [
-    {
-      id: "MoCeyxAdd8I", // Ilakana Kavithai
-      ans: ["ilakana kavithai", "ilakana", "banaras", "kavithai"],
-      vibe: "Song 1: இது உன் பேரோட சேர்ந்த melody! Remember?",
-      start: 45
-    },
-    {
-      id: "eczR_IE919s", // Katre Poongatre
-      ans: ["katre poongatre", "katre", "priyamana thozhi", "priyamanathozhi"],
-      vibe: "Song 2: Our favorite friendship anthem! 🎶",
-      start: 65
-    },
-    {
-      id: "M6H78I0Y4Yk", // Pookkal Pookkum
-      ans: ["pookkal pookkum", "pookal pookum", "madharasapattinam", "madrasapattinam", "pookal"],
-      vibe: "Song 3: The ultimate classic from Madrasapattinam!",
-      start: 72
+    const songs = [
+        {
+            file: "song1.mp3", // Ilakana Kavithai
+            ans: ["ilakana kavithai", "ilakana", "banaras", "kavithai"],
+            vibe: "Song 1: your fav.. melody! Remember?",
+        },
+        {
+            file: "song2.mp3", // Katre Poongatre
+            ans: ["katre poongatre", "katre", "priyamana thozhi", "priyamanathozhi"],
+            vibe: "Song 2: Our favorite friendship anthem! 🎶",
+        },
+        {
+            file: "song3.mp3", // Pookkal Pookkum
+            ans: ["pookkal pookkum", "pookal pookum", "madharasapattinam", "madrasapattinam", "pookal"],
+            vibe: "Song 3: The ultimate classic from Madrasapattinam!",
+        }
+    ];
+
+    let currentRound = 0;
+    let timer;
+    let timeLeft = 30;
+    const player = document.getElementById('audio-player');
+
+    function startQuiz() {
+        document.getElementById('welcome').classList.remove('active');
+        document.getElementById('quiz').classList.add('active');
+        loadRound();
     }
-  ];
 
-  let currentRound = 0;
-  let player;
-  let timer;
-  let timeLeft = 30;
+    function loadRound() {
+        const song = songs[currentRound];
+        document.getElementById('round-num').innerText = `MEMORY ${currentRound + 1}/3`;
+        document.getElementById('memory-vibe').innerText = song.vibe;
+        document.getElementById('answer').value = '';
+        document.getElementById('feedback').innerText = '';
+        timeLeft = 30;
+        document.getElementById('timer-bar').style.width = '100%';
 
-  // Load YouTube API
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        // Load and Play local MP3
+        player.src = song.file;
+        player.play();
+        startTimer();
+    }
 
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-      height: '0', width: '0',
-      events: { 'onStateChange': onPlayerStateChange }
-    });
-  }
-
-  function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.PLAYING) startTimer();
-    if (event.data == YT.PlayerState.ENDED) reloadSong();
-  }
-
-  function startQuiz() {
-    document.getElementById('welcome').classList.remove('active');
-    document.getElementById('quiz').classList.add('active');
-    loadRound();
-  }
-
-  function loadRound() {
-    const song = songs[currentRound];
-    document.getElementById('round-num').innerText = `MEMORY ${currentRound + 1}/3`;
-    document.getElementById('memory-vibe').innerText = song.vibe;
-    document.getElementById('answer').value = '';
-    document.getElementById('feedback').innerText = '';
-    timeLeft = 30;
-    document.getElementById('timer-bar').style.width = '100%';
-
-    player.loadVideoById({
-      videoId: song.id,
-      startSeconds: song.start
-    });
-  }
-
-  function startTimer() {
-    clearInterval(timer);
-    timer = setInterval(() => {
-      timeLeft--;
-      document.getElementById('timer-bar').style.width = (timeLeft / 30 * 100) + "%";
-      if (timeLeft <= 0) {
+    function startTimer() {
         clearInterval(timer);
-        document.getElementById('feedback').innerText = "Time Up! Replaying...";
-        setTimeout(loadRound, 1500);
-      }
-    }, 1000);
-  }
-
-  function reloadSong() {
-    player.seekTo(songs[currentRound].start);
-    player.playVideo();
-  }
-
-  function verifyAnswer() {
-    const input = document.getElementById('answer').value.toLowerCase().trim();
-    const song = songs[currentRound];
-
-    const isCorrect = song.ans.some(a => input.includes(a) && input.length >= 4);
-
-    if (isCorrect) {
-      clearInterval(timer);
-      player.stopVideo();
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-      document.getElementById('feedback').innerHTML = "<span style='color:#4CAF50'>Semma! Correct answer. ✨</span>";
-
-      setTimeout(() => {
-        currentRound++;
-        if (currentRound < 3) loadRound();
-        else showTreasure();
-      }, 2000);
-    } else {
-      document.getElementById('feedback').innerHTML = "<span style='color:#f44336'>Try again! Think of the movie...</span>";
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer-bar').style.width = (timeLeft / 30 * 100) + "%";
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                player.pause();
+                document.getElementById('feedback').innerText = "Time Up! Replaying...";
+                setTimeout(loadRound, 1500);
+            }
+        }, 1000);
     }
-  }
 
-  function showTreasure() {
-    document.getElementById('quiz').classList.remove('active');
-    document.getElementById('treasure').classList.add('active');
+    function verifyAnswer() {
+        const input = document.getElementById('answer').value.toLowerCase().trim();
+        const song = songs[currentRound];
 
-    // Continuous celebratory confetti
-    var end = Date.now() + (5 * 1000);
-    (function frame() {
-      confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFD700', '#ec407a'] });
-      confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFD700', '#ec407a'] });
-      if (Date.now() < end) requestAnimationFrame(frame);
-    }());
-  }
+        const isCorrect = song.ans.some(a => input.includes(a) && input.length >= 4);
+
+        if (isCorrect) {
+            clearInterval(timer);
+            player.pause();
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            document.getElementById('feedback').innerHTML = "<span style='color:#4CAF50'>Semma! Correct answer. ✨</span>";
+
+            setTimeout(() => {
+                currentRound++;
+                if (currentRound < 3) loadRound();
+                else showTreasure();
+            }, 2000);
+        } else {
+            document.getElementById('feedback').innerHTML = "<span style='color:#f44336'>Try again! Think of the movie...</span>";
+        }
+    }
+
+    function showTreasure() {
+        document.getElementById('quiz').classList.remove('active');
+        document.getElementById('treasure').classList.add('active');
+
+        var end = Date.now() + (5 * 1000);
+        (function frame() {
+            confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFD700', '#ec407a'] });
+            confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFD700', '#ec407a'] });
+            if (Date.now() < end) requestAnimationFrame(frame);
+        }());
+    }
 </script>
-</body>
-</html>
